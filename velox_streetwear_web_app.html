@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="ms" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VELOX STREETWEAR — Official Store</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              zinc: {
+                950: '#09090b',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- React & ReactDOM UMD -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <!-- Babel Standalone untuk menyokong React JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+        }
+        /* Touch friendly tap targets */
+        button, a, input, select, textarea {
+            touch-action: manipulation;
+        }
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #09090b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+    </style>
+</head>
+<body class="bg-black text-white antialiased selection:bg-zinc-800 selection:text-white min-h-screen flex flex-col">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- INLINE SVG ICONS (Self-contained, Fast & Reliable) ---
+        const ShoppingBag = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+        );
+
+        const Menu = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
+            </svg>
+        );
+
+        const X = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+            </svg>
+        );
+
+        const Check = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polyline points="20 6 9 17 4 12"/>
+            </svg>
+        );
+
+        const AlertCircle = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+            </svg>
+        );
+
+        const Upload = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>
+            </svg>
+        );
+
+        const Package = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>
+            </svg>
+        );
+
+        const Settings = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+        );
+
+        const CreditCard = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>
+            </svg>
+        );
+
+        const ArrowLeft = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <line x1="19" x2="5" y1="12" y2="12"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
+        );
+
+        const Plus = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/>
+            </svg>
+        );
+
+        const Truck = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M10 17h4V5H2v12h3"/><path d="M20 17h2v-6l-3-4h-5v10h2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
+            </svg>
+        );
+
+        const ShieldCheck = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/>
+            </svg>
+        );
+
+        const Camera = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>
+            </svg>
+        );
+
+        const Database = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+            </svg>
+        );
+
+        const ChevronRight = ({ size = 24, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="m9 18 6-6-6-6"/>
+            </svg>
+        );
+
+        // --- MOCK DATA FOR STOREFRONT ---
+        const INITIAL_PRODUCTS = [
+          {
+            id: 'p-1',
+            name: 'Velox Endurance Tracksuit Pants',
+            description: 'Premium lightweight tracksuit pants designed for maximum mobility and streetwear aesthetics. Features water-resistant fabric and hidden zip pockets.',
+            price: 129.00,
+            salePrice: 99.00,
+            colors: ['Stealth Black', 'Charcoal Grey', 'Endurance Red'],
+            sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+            images: ['https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&q=80&w=800'],
+            stock: 150,
+            status: 'published'
+          },
+          {
+            id: 'p-2',
+            name: 'Velox Urban Cargo Joggers',
+            description: 'Heavyweight cotton-blend joggers with tactical cargo pockets. Perfect for the Malaysian urban climate.',
+            price: 149.00,
+            salePrice: null,
+            colors: ['Stealth Black', 'Olive Green'],
+            sizes: ['S', 'M', 'L', 'XL'],
+            images: ['https://images.unsplash.com/photo-1517438322307-e67111335449?auto=format&fit=crop&q=80&w=800'],
+            stock: 80,
+            status: 'published'
+          }
+        ];
+
+        const DEFAULT_STORE_SETTINGS = {
+          brandName: 'VELOX STREETWEAR',
+          contactNumber: '+60 12-345 6789',
+          shippingFee: 10.00,
+          freeShippingThreshold: 200.00,
+          bankDetails: {
+            bankName: 'Maybank',
+            accountName: 'VELOX APPAREL ENTERPRISE',
+            accountNumber: '5621 2345 6789'
+          },
+          qrImageUrl: ''
+        };
+
+        // --- MAIN APP COMPONENT ---
+        function App() {
+          const [currentView, setCurrentView] = useState('storefront'); // storefront, product, cart, checkout, admin, order-success
+          const [products, setProducts] = useState(INITIAL_PRODUCTS);
+          const [storeSettings, setStoreSettings] = useState(DEFAULT_STORE_SETTINGS);
+          const [selectedProduct, setSelectedProduct] = useState(null);
+          const [cart, setCart] = useState([]);
+          const [orders, setOrders] = useState([]);
+          const [completedOrder, setCompletedOrder] = useState(null);
+          const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+          const [showSetupModal, setShowSetupModal] = useState(false);
+          const [toastMessage, setToastMessage] = useState(null);
+
+          // Toast Notification Helper (replaces browser alert)
+          const showNotification = (msg, type = 'info') => {
+            setToastMessage({ msg, type });
+            setTimeout(() => setToastMessage(null), 3500);
+          };
+
+          // Navigation Helper
+          const navigateTo = (view, product = null) => {
+            setCurrentView(view);
+            if (product) setSelectedProduct(product);
+            setIsMobileMenuOpen(false);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          };
+
+          // Cart Helpers
+          const addToCart = (product, size, color, quantity = 1) => {
+            setCart(prev => {
+              const existing = prev.find(item => item.id === product.id && item.size === size && item.color === color);
+              if (existing) {
+                return prev.map(item => item === existing ? { ...item, quantity: item.quantity + quantity } : item);
+              }
+              return [...prev, { ...product, size, color, quantity }];
+            });
+            showNotification(`Added ${product.name} (${color}, ${size}) to cart`, 'success');
+          };
+
+          const removeFromCart = (index) => {
+            setCart(prev => prev.filter((_, i) => i !== index));
+          };
+
+          const cartTotal = cart.reduce((total, item) => total + ((item.salePrice || item.price) * item.quantity), 0);
+          const shippingFee = cartTotal >= storeSettings.freeShippingThreshold ? 0 : storeSettings.shippingFee;
+
+          // --- NAVBAR SUB-COMPONENT ---
+          const Navbar = () => (
+            <>
+              {/* Preview Banner */}
+              <div className="bg-zinc-900 border-b border-zinc-800 text-zinc-400 text-xs py-2 px-4 flex flex-wrap justify-between items-center font-mono gap-2">
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                  <span>PREVIEW MODE: Standalone HTML (Production Ready UI)</span>
+                </div>
+                <button 
+                  onClick={() => setShowSetupModal(true)} 
+                  className="text-white bg-zinc-800 hover:bg-zinc-700 px-2.5 py-1 rounded text-xs transition-colors flex items-center gap-1 font-sans font-medium"
+                >
+                  <Database size={12} /> Supabase Setup & SQL Schema
+                </button>
+              </div>
+
+              <nav className="sticky top-0 z-40 bg-black/90 backdrop-blur-md border-b border-zinc-800 text-white">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <div className="flex items-center justify-between h-16">
+                    {/* Mobile Menu & Desktop Links */}
+                    <div className="flex items-center space-x-4">
+                      <button 
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+                        className="sm:hidden p-2 text-zinc-400 hover:text-white"
+                        aria-label="Toggle Menu"
+                      >
+                        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                      </button>
+                      <div className="hidden sm:flex space-x-6 text-sm font-medium">
+                        <button onClick={() => navigateTo('storefront')} className="hover:text-zinc-300 transition-colors">SHOP ALL</button>
+                        <button onClick={() => navigateTo('storefront')} className="hover:text-zinc-300 transition-colors">NEW DROPS</button>
+                      </div>
+                    </div>
+
+                    {/* Brand Name */}
+                    <div className="flex-1 text-center sm:flex-none">
+                      <button onClick={() => navigateTo('storefront')} className="text-xl font-black tracking-tighter text-white hover:opacity-80 transition-opacity">
+                        {storeSettings.brandName}
+                      </button>
+                    </div>
+
+                    {/* Admin & Cart Buttons */}
+                    <div className="flex items-center space-x-3 sm:space-x-4">
+                      <button 
+                        onClick={() => navigateTo('admin')} 
+                        className="text-xs font-mono text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-600 px-2.5 py-1.5 rounded transition-colors"
+                      >
+                        ADMIN
+                      </button>
+                      <button 
+                        onClick={() => navigateTo('cart')} 
+                        className="relative p-2 text-zinc-300 hover:text-white transition-colors"
+                        aria-label="Cart"
+                      >
+                        <ShoppingBag size={22} />
+                        {cart.length > 0 && (
+                          <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-black transform translate-x-1/4 -translate-y-1/4 bg-white rounded-full min-w-[18px]">
+                            {cart.reduce((total, item) => total + item.quantity, 0)}
+                          </span>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mobile Dropdown Menu */}
+                {isMobileMenuOpen && (
+                  <div className="sm:hidden bg-zinc-900 border-b border-zinc-800 absolute w-full left-0 z-50">
+                    <div className="px-4 pt-3 pb-4 space-y-2">
+                      <button onClick={() => navigateTo('storefront')} className="block w-full text-left px-3 py-2 rounded text-base font-medium text-white hover:bg-zinc-800">Shop All</button>
+                      <button onClick={() => navigateTo('admin')} className="block w-full text-left px-3 py-2 rounded text-base font-medium text-zinc-400 hover:bg-zinc-800">Admin Dashboard</button>
+                    </div>
+                  </div>
+                )}
+              </nav>
+            </>
+          );
+
+          // --- STOREFRONT VIEW ---
+          const StorefrontView = () => (
+            <div className="bg-black min-h-screen text-white pb-20">
+              {/* Hero Banner */}
+              <div className="relative bg-zinc-900 h-[55vh] sm:h-[65vh] flex items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/60 z-10" />
+                <img 
+                  src="https://images.unsplash.com/photo-1577907577543-7f3f3503b418?auto=format&fit=crop&q=80&w=1600" 
+                  alt="Hero Streetwear" 
+                  className="absolute inset-0 w-full h-full object-cover opacity-50 grayscale"
+                />
+                <div className="relative z-20 text-center px-4 max-w-2xl">
+                  <span className="inline-block text-xs font-mono tracking-widest text-zinc-400 mb-3 bg-zinc-900/80 px-3 py-1 rounded border border-zinc-800">
+                    UNISEX COLLECTION 2026
+                  </span>
+                  <h1 className="text-4xl sm:text-6xl font-black tracking-tighter mb-4 leading-tight">
+                    ENGINEERED FOR<br/>THE STREETS.
+                  </h1>
+                  <p className="text-zinc-400 text-sm sm:text-base mb-8 max-w-md mx-auto">
+                    Premium tracksuits and joggers designed specifically for mobility and Malaysian urban heat.
+                  </p>
+                  <button 
+                    onClick={() => document.getElementById('products-grid').scrollIntoView({ behavior: 'smooth' })} 
+                    className="bg-white text-black px-8 py-3.5 font-bold text-sm tracking-wider hover:bg-zinc-200 transition-colors rounded-sm"
+                  >
+                    SHOP NEW DROPS
+                  </button>
+                </div>
+              </div>
+
+              {/* Product Grid */}
+              <div id="products-grid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div className="flex justify-between items-end mb-8 border-b border-zinc-900 pb-4">
+                  <div>
+                    <h2 className="text-2xl font-black tracking-tight">FEATURED PRODUCTS</h2>
+                    <p className="text-xs text-zinc-500 font-mono mt-1">SELECT A PRODUCT TO VIEW DETAILS & VARIANTS</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {products.filter(p => p.status === 'published').map(product => (
+                    <div 
+                      key={product.id} 
+                      className="group cursor-pointer bg-zinc-950 border border-zinc-900 p-3 rounded-sm hover:border-zinc-700 transition-colors" 
+                      onClick={() => navigateTo('product', product)}
+                    >
+                      <div className="relative bg-zinc-900 aspect-[4/5] mb-4 overflow-hidden rounded-sm">
+                        <img 
+                          src={product.images[0]} 
+                          alt={product.name}
+                          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-out"
+                        />
+                        {product.salePrice && (
+                          <div className="absolute top-3 left-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm">
+                            SALE
+                          </div>
+                        )}
+                      </div>
+                      <h3 className="text-base font-bold text-zinc-100 mb-1">{product.name}</h3>
+                      <p className="text-xs text-zinc-500 line-clamp-1 mb-3">{product.description}</p>
+                      <div className="flex items-center justify-between border-t border-zinc-900 pt-3">
+                        <div className="flex items-center space-x-2">
+                          {product.salePrice ? (
+                            <>
+                              <span className="text-white font-bold text-base">RM {product.salePrice.toFixed(2)}</span>
+                              <span className="text-zinc-500 line-through text-xs">RM {product.price.toFixed(2)}</span>
+                            </>
+                          ) : (
+                            <span className="text-white font-bold text-base">RM {product.price.toFixed(2)}</span>
+                          )}
+                        </div>
+                        <span className="text-xs font-mono text-zinc-400 group-hover:text-white flex items-center">
+                          VIEW <ChevronRight size={14} className="ml-1" />
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+
+          // --- PRODUCT DETAIL VIEW ---
+          const ProductDetailView = () => {
+            const [selectedSize, setSelectedSize] = useState('');
+            const [selectedColor, setSelectedColor] = useState('');
+            const [error, setError] = useState('');
+
+            if (!selectedProduct) return null;
+
+            const handleAddToCart = () => {
+              if (!selectedColor) {
+                setError('Sila pilih warna (*Please select a color*)');
+                return;
+              }
+              if (!selectedSize) {
+                setError('Sila pilih saiz (*Please select a size*)');
+                return;
+              }
+              addToCart(selectedProduct, selectedSize, selectedColor);
+              setError('');
+            };
+
+            return (
+              <div className="bg-black min-h-screen text-white pt-8 pb-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <button 
+                    onClick={() => navigateTo('storefront')} 
+                    className="flex items-center text-zinc-400 hover:text-white mb-8 transition-colors text-sm font-medium"
+                  >
+                    <ArrowLeft size={18} className="mr-2" /> Kembali ke Kedai
+                  </button>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    {/* Main Product Image */}
+                    <div className="space-y-4">
+                      <div className="aspect-[4/5] bg-zinc-900 rounded-sm overflow-hidden border border-zinc-800">
+                        <img src={selectedProduct.images[0]} alt={selectedProduct.name} className="w-full h-full object-cover" />
+                      </div>
+                    </div>
+
+                    {/* Product Options & Details */}
+                    <div className="flex flex-col">
+                      <h1 className="text-3xl sm:text-4xl font-black tracking-tight mb-2">{selectedProduct.name}</h1>
+                      
+                      <div className="flex items-center space-x-3 mb-6">
+                        {selectedProduct.salePrice ? (
+                          <>
+                            <span className="text-2xl font-bold text-white">RM {selectedProduct.salePrice.toFixed(2)}</span>
+                            <span className="text-lg text-zinc-500 line-through">RM {selectedProduct.price.toFixed(2)}</span>
+                            <span className="bg-red-950/80 border border-red-900 text-red-400 text-xs font-bold px-2 py-1 rounded-sm">
+                              SAVE RM {(selectedProduct.price - selectedProduct.salePrice).toFixed(2)}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-2xl font-bold text-white">RM {selectedProduct.price.toFixed(2)}</span>
+                        )}
+                      </div>
+
+                      <p className="text-zinc-400 text-sm mb-8 leading-relaxed border-y border-zinc-900 py-4">{selectedProduct.description}</p>
+
+                      {/* Color Selector */}
+                      <div className="mb-6">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-xs font-mono text-zinc-400 uppercase">Warna: {selectedColor || 'Sila Pilih'}</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2.5">
+                          {selectedProduct.colors.map(color => (
+                            <button
+                              key={color}
+                              onClick={() => { setSelectedColor(color); setError(''); }}
+                              className={`px-4 py-2.5 text-xs font-medium border rounded-sm transition-colors ${
+                                selectedColor === color 
+                                  ? 'border-white text-white bg-zinc-900 font-bold' 
+                                  : 'border-zinc-800 text-zinc-400 hover:border-zinc-600'
+                              }`}
+                            >
+                              {color}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Size Selector */}
+                      <div className="mb-8">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-xs font-mono text-zinc-400 uppercase">Saiz: {selectedSize || 'Sila Pilih'}</span>
+                          <span className="text-[11px] text-zinc-500">Unisex Standard Fit</span>
+                        </div>
+                        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
+                          {selectedProduct.sizes.map(size => (
+                            <button
+                              key={size}
+                              onClick={() => { setSelectedSize(size); setError(''); }}
+                              className={`py-3 text-xs font-mono border rounded-sm transition-colors ${
+                                selectedSize === size 
+                                  ? 'border-white text-white bg-zinc-900 font-bold' 
+                                  : 'border-zinc-800 text-zinc-400 hover:border-zinc-600'
+                              }`}
+                            >
+                              {size}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {error && (
+                        <div className="mb-4 p-3 bg-red-950/50 border border-red-900 text-red-400 text-xs rounded-sm flex items-center">
+                          <AlertCircle size={16} className="mr-2 flex-shrink-0" /> {error}
+                        </div>
+                      )}
+
+                      <button 
+                        onClick={handleAddToCart}
+                        className="w-full bg-white text-black font-bold py-4 rounded-sm hover:bg-zinc-200 transition-colors flex justify-center items-center text-sm tracking-wider"
+                      >
+                        <ShoppingBag size={18} className="mr-2" />
+                        MASUKKAN KE TROLI
+                      </button>
+
+                      {/* Store Guarantees */}
+                      <div className="mt-8 space-y-3 pt-6 border-t border-zinc-900 text-xs text-zinc-400">
+                        <div className="flex items-start">
+                          <Truck size={16} className="mr-3 mt-0.5 flex-shrink-0 text-zinc-300" />
+                          <p>Penghantaran pantas ke seluruh Malaysia (PosLaju / J&T).</p>
+                        </div>
+                        <div className="flex items-start">
+                          <ShieldCheck size={16} className="mr-3 mt-0.5 flex-shrink-0 text-zinc-300" />
+                          <p>100% Barangan Asli dengan polisi pertukaran saiz 14 hari.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          };
+
+          // --- CART VIEW ---
+          const CartView = () => (
+            <div className="bg-black min-h-screen text-white pt-8 pb-20">
+              <div className="max-w-4xl mx-auto px-4 sm:px-6">
+                <h1 className="text-3xl font-black tracking-tight mb-8">TROLI BELI-BELAH</h1>
+                
+                {cart.length === 0 ? (
+                  <div className="text-center py-16 bg-zinc-950 rounded-sm border border-zinc-900">
+                    <ShoppingBag size={48} className="mx-auto text-zinc-700 mb-4" />
+                    <h2 className="text-lg font-medium text-zinc-300 mb-6">Troli anda masih kosong</h2>
+                    <button 
+                      onClick={() => navigateTo('storefront')} 
+                      className="bg-white text-black px-8 py-3 font-bold text-xs tracking-wider rounded-sm hover:bg-zinc-200"
+                    >
+                      LIHAT PRODUCTS
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2 space-y-4">
+                      {cart.map((item, index) => (
+                        <div key={index} className="flex gap-4 p-4 bg-zinc-950 border border-zinc-900 rounded-sm">
+                          <div className="w-20 h-24 bg-zinc-900 flex-shrink-0 overflow-hidden rounded-sm">
+                            <img src={item.images[0]} alt={item.name} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="flex-grow flex flex-col justify-between">
+                            <div>
+                              <div className="flex justify-between items-start">
+                                <h3 className="font-bold text-zinc-100 text-sm pr-4">{item.name}</h3>
+                                <button onClick={() => removeFromCart(index)} className="text-zinc-600 hover:text-red-400 p-1">
+                                  <X size={18} />
+                                </button>
+                              </div>
+                              <p className="text-xs text-zinc-400 mt-1">Variasi: <span className="text-white">{item.color}</span> | Saiz: <span className="text-white">{item.size}</span></p>
+                            </div>
+                            <div className="flex justify-between items-end pt-2">
+                              <div className="text-xs text-zinc-500 font-mono">Kuantiti: {item.quantity}</div>
+                              <div className="font-bold text-white text-sm">
+                                RM {((item.salePrice || item.price) * item.quantity).toFixed(2)}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="lg:col-span-1">
+                      <div className="bg-zinc-950 border border-zinc-900 p-6 rounded-sm sticky top-24">
+                        <h3 className="text-sm font-bold tracking-wider mb-4 border-b border-zinc-900 pb-2">RINGKASAN PESANAN</h3>
+                        <div className="space-y-3 text-xs mb-6">
+                          <div className="flex justify-between text-zinc-400">
+                            <span>Jumlah Kecil (*Subtotal*)</span>
+                            <span className="text-white font-mono">RM {cartTotal.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between text-zinc-400">
+                            <span>Kos Penghantaran</span>
+                            <span className="text-white font-mono">{shippingFee === 0 ? 'PERCUMA' : `RM ${shippingFee.toFixed(2)}`}</span>
+                          </div>
+                          {cartTotal < storeSettings.freeShippingThreshold && (
+                            <p className="text-[11px] text-amber-500 pt-1">
+                              Tambah RM {(storeSettings.freeShippingThreshold - cartTotal).toFixed(2)} lagi untuk Penghantaran Percuma!
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex justify-between text-lg font-black mb-6 pt-4 border-t border-zinc-900">
+                          <span>JUMLAH</span>
+                          <span className="font-mono">RM {(cartTotal + shippingFee).toFixed(2)}</span>
+                        </div>
+                        <button 
+                          onClick={() => navigateTo('checkout')}
+                          className="w-full bg-white text-black font-bold py-3.5 rounded-sm hover:bg-zinc-200 transition-colors text-xs tracking-wider"
+                        >
+                          PROSES CHECKOUT
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+
+          // --- CHECKOUT VIEW ---
+          const CheckoutView = () => {
+            const [step, setStep] = useState(1);
+            const [formData, setFormData] = useState({
+              fullName: '', phone: '', email: '', address: '', postcode: '', state: 'Kuala Lumpur', notes: ''
+            });
+            const [paymentMethod, setPaymentMethod] = useState('duitnow');
+            const [receiptFile, setReceiptFile] = useState(null);
+            const [receiptPreview, setReceiptPreview] = useState(null);
+            const [isSubmitting, setIsSubmitting] = useState(false);
+
+            const handleInput = (e) => setFormData({...formData, [e.target.name]: e.target.value});
+            
+            const handleFileChange = (e) => {
+              if (e.target.files && e.target.files[0]) {
+                const file = e.target.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                  showNotification("Saiz fail terlalu besar (Maksimum 5MB)", "error");
+                  return;
+                }
+                if (!['image/jpeg', 'image/png', 'application/pdf'].includes(file.type)) {
+                  showNotification("Format fail tidak disokong. Sila guna JPG, PNG atau PDF.", "error");
+                  return;
+                }
+                setReceiptFile(file);
+                if (file.type.startsWith('image/')) {
+                  const reader = new FileReader();
+                  reader.onload = (evt) => setReceiptPreview(evt.target.result);
+                  reader.readAsDataURL(file);
+                } else {
+                  setReceiptPreview(null);
+                }
+              }
+            };
+
+            const submitOrder = () => {
+              setIsSubmitting(true);
+              setTimeout(() => {
+                const orderId = `VX-${Math.floor(100000 + Math.random() * 900000)}`;
+                const newOrder = {
+                  id: orderId,
+                  date: new Date().toISOString(),
+                  customer: formData,
+                  items: [...cart],
+                  total: cartTotal + shippingFee,
+                  paymentMethod,
+                  paymentStatus: receiptFile ? 'under_review' : 'awaiting_payment',
+                  fulfilmentStatus: 'unfulfilled',
+                  receiptPreview: receiptPreview,
+                  receiptName: receiptFile ? receiptFile.name : null
+                };
+                
+                setOrders(prev => [newOrder, ...prev]);
+                setCompletedOrder(newOrder);
+                setCart([]);
+                setIsSubmitting(false);
+                navigateTo('order-success');
+              }, 1200);
+            };
+
+            return (
+              <div className="bg-black min-h-screen text-white pt-8 pb-20">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6">
+                  <button onClick={() => setStep(1)} className="flex items-center text-zinc-400 hover:text-white mb-6 text-xs">
+                    <ArrowLeft size={16} className="mr-2" /> Kembali
+                  </button>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2">
+                      {step === 1 ? (
+                        <div className="space-y-6 bg-zinc-950 p-6 border border-zinc-900 rounded-sm">
+                          <div>
+                            <h2 className="text-xl font-bold tracking-tight mb-4 border-b border-zinc-900 pb-2">1. Maklumat Penghantaran</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                              <div className="sm:col-span-2">
+                                <label className="block font-mono text-zinc-400 mb-1">NAMA PENUH *</label>
+                                <input name="fullName" value={formData.fullName} onChange={handleInput} type="text" placeholder="e.g. Ahmad Razak" className="w-full bg-black border border-zinc-800 rounded-sm p-3 text-white focus:border-white outline-none" required />
+                              </div>
+                              <div>
+                                <label className="block font-mono text-zinc-400 mb-1">NOMBOR TELEFON (MY) *</label>
+                                <input name="phone" value={formData.phone} onChange={handleInput} type="tel" placeholder="e.g. 0123456789" className="w-full bg-black border border-zinc-800 rounded-sm p-3 text-white focus:border-white outline-none" required />
+                              </div>
+                              <div>
+                                <label className="block font-mono text-zinc-400 mb-1">EMEL (PILIHAN)</label>
+                                <input name="email" value={formData.email} onChange={handleInput} type="email" placeholder="e.g. ahmad@example.com" className="w-full bg-black border border-zinc-800 rounded-sm p-3 text-white focus:border-white outline-none" />
+                              </div>
+                              <div className="sm:col-span-2">
+                                <label className="block font-mono text-zinc-400 mb-1">ALAMAT RUMAH / PREMIS *</label>
+                                <textarea name="address" value={formData.address} onChange={handleInput} rows="2" placeholder="Nombor rumah, jalan, taman..." className="w-full bg-black border border-zinc-800 rounded-sm p-3 text-white focus:border-white outline-none" required></textarea>
+                              </div>
+                              <div>
+                                <label className="block font-mono text-zinc-400 mb-1">POSKOD *</label>
+                                <input name="postcode" value={formData.postcode} onChange={handleInput} type="text" placeholder="e.g. 50000" className="w-full bg-black border border-zinc-800 rounded-sm p-3 text-white focus:border-white outline-none" required />
+                              </div>
+                              <div>
+                                <label className="block font-mono text-zinc-400 mb-1">NEGERI *</label>
+                                <select name="state" value={formData.state} onChange={handleInput} className="w-full bg-black border border-zinc-800 rounded-sm p-3 text-white focus:border-white outline-none">
+                                  <option>Kuala Lumpur</option><option>Selangor</option><option>Penang</option><option>Johor</option>
+                                  <option>Perak</option><option>Kedah</option><option>Melaka</option><option>Negeri Sembilan</option>
+                                  <option>Pahang</option><option>Terengganu</option><option>Kelantan</option><option>Perlis</option>
+                                  <option>Sabah</option><option>Sarawak</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => {
+                              if(formData.fullName && formData.phone && formData.address && formData.postcode) setStep(2);
+                              else showNotification('Sila lengkapkan semua ruangan wajib (*)', 'error');
+                            }}
+                            className="w-full bg-white text-black font-bold py-3.5 rounded-sm hover:bg-zinc-200 transition-colors text-xs tracking-wider"
+                          >
+                            TERUSKAN KE PEMBAYARAN
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-6 bg-zinc-950 p-6 border border-zinc-900 rounded-sm">
+                          <div>
+                            <h2 className="text-xl font-bold tracking-tight mb-2 border-b border-zinc-900 pb-2">2. Pembayaran Manual</h2>
+                            <p className="text-zinc-400 text-xs mb-6">Pilih kaedah bayaran di bawah dan muat naik resit transaksi anda.</p>
+                            
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                              <button 
+                                onClick={() => setPaymentMethod('duitnow')} 
+                                className={`p-4 border rounded-sm flex flex-col items-center justify-center gap-2 transition-colors ${paymentMethod === 'duitnow' ? 'border-white bg-zinc-900 text-white' : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'}`}
+                              >
+                                <Camera size={22} />
+                                <span className="font-bold text-xs">DuitNow QR</span>
+                              </button>
+                              <button 
+                                onClick={() => setPaymentMethod('bank')} 
+                                className={`p-4 border rounded-sm flex flex-col items-center justify-center gap-2 transition-colors ${paymentMethod === 'bank' ? 'border-white bg-zinc-900 text-white' : 'border-zinc-800 text-zinc-500 hover:border-zinc-600'}`}
+                              >
+                                <CreditCard size={22} />
+                                <span className="font-bold text-xs">Bank Transfer</span>
+                              </button>
+                            </div>
+
+                            <div className="bg-black p-6 rounded-sm border border-zinc-800 mb-6">
+                              {paymentMethod === 'duitnow' ? (
+                                <div className="text-center">
+                                  <div className="w-48 h-48 bg-zinc-900 mx-auto mb-4 flex items-center justify-center border border-zinc-800 overflow-hidden rounded-sm">
+                                    {storeSettings.qrImageUrl ? (
+                                      <img src={storeSettings.qrImageUrl} alt="DuitNow QR Code" className="w-full h-full object-contain bg-white p-2" />
+                                    ) : (
+                                      <div className="text-center p-4 border-2 border-dashed border-zinc-800 w-full h-full flex flex-col items-center justify-center text-zinc-600">
+                                        <Camera size={24} className="mb-2 opacity-40" />
+                                        <span className="text-[10px] font-mono">TIADA GAMBAR QR (ADMIN BOLEH UPLOAD DI DASHBOARD)</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <p className="font-bold text-sm mb-1">{storeSettings.brandName}</p>
+                                  <p className="text-zinc-500 text-xs">Imbas guna mana-mana aplikasi perbankan atau e-Wallet</p>
+                                </div>
+                              ) : (
+                                <div className="space-y-3 text-xs">
+                                  <div>
+                                    <p className="text-zinc-500 font-mono">NAMA BANK</p>
+                                    <p className="font-bold text-sm text-white">{storeSettings.bankDetails.bankName}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-zinc-500 font-mono">PEMEGANG AKAUN</p>
+                                    <p className="font-bold text-sm text-white">{storeSettings.bankDetails.accountName}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-zinc-500 font-mono">NOMBOR AKAUN</p>
+                                    <p className="font-mono text-base text-white bg-zinc-900 px-3 py-1.5 rounded border border-zinc-800 inline-block mt-1">
+                                      {storeSettings.bankDetails.accountNumber}
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                              
+                              <div className="mt-6 pt-4 border-t border-zinc-900 text-center">
+                                <p className="text-xs text-zinc-400 mb-1">JUMLAH PERLU DIBAYAR</p>
+                                <p className="text-2xl font-black text-white font-mono">RM {(cartTotal + shippingFee).toFixed(2)}</p>
+                              </div>
+                            </div>
+
+                            {/* Receipt Upload Input */}
+                            <label className="border-2 border-dashed border-zinc-800 p-6 rounded-sm text-center hover:bg-zinc-900/50 transition-colors cursor-pointer group block">
+                              <input type="file" accept="image/jpeg, image/png, application/pdf" className="hidden" onChange={handleFileChange} />
+                              {receiptFile ? (
+                                <div className="text-green-400 flex flex-col items-center">
+                                  <Check size={28} className="mb-2" />
+                                  <span className="font-medium text-xs">{receiptFile.name} (Sedia Dimuat Naik)</span>
+                                  <span className="text-[10px] mt-1 text-zinc-500">Ketik untuk tukar fail</span>
+                                </div>
+                              ) : (
+                                <div className="text-zinc-400 flex flex-col items-center group-hover:text-white">
+                                  <Upload size={28} className="mb-2" />
+                                  <span className="font-medium text-xs">Klik untuk muat naik Resit Pembayaran</span>
+                                  <span className="text-[10px] mt-1 text-zinc-500">Sokong format JPG, PNG atau PDF (Max 5MB)</span>
+                                </div>
+                              )}
+                            </label>
+                          </div>
+                          
+                          <button 
+                            onClick={submitOrder}
+                            disabled={isSubmitting}
+                            className="w-full bg-white text-black font-bold py-3.5 rounded-sm hover:bg-zinc-200 transition-colors flex items-center justify-center text-xs tracking-wider disabled:opacity-50"
+                          >
+                            {isSubmitting ? (
+                              <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                              <><Check size={18} className="mr-2" /> SAHKAN PESANAN</>
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Order Sidebar */}
+                    <div className="lg:col-span-1">
+                      <div className="bg-zinc-950 border border-zinc-900 p-6 rounded-sm sticky top-24">
+                        <h3 className="text-xs font-bold tracking-wider mb-4 border-b border-zinc-900 pb-2">RINGKASAN ITEM</h3>
+                        <div className="space-y-3 mb-6 max-h-60 overflow-y-auto pr-1">
+                          {cart.map((item, idx) => (
+                            <div key={idx} className="flex gap-3">
+                              <div className="w-12 h-16 bg-zinc-900 flex-shrink-0">
+                                <img src={item.images[0]} alt="" className="w-full h-full object-cover" />
+                              </div>
+                              <div className="flex-grow text-xs">
+                                <p className="font-medium text-white truncate">{item.name}</p>
+                                <p className="text-[11px] text-zinc-500">{item.color}, {item.size} x {item.quantity}</p>
+                                <p className="font-bold text-white mt-1">RM {((item.salePrice || item.price) * item.quantity).toFixed(2)}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="space-y-2 text-xs mb-4 border-t border-zinc-900 pt-4">
+                          <div className="flex justify-between text-zinc-400">
+                            <span>Subtotal</span>
+                            <span className="font-mono">RM {cartTotal.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between text-zinc-400">
+                            <span>Penghantaran</span>
+                            <span className="font-mono">{shippingFee === 0 ? 'PERCUMA' : `RM ${shippingFee.toFixed(2)}`}</span>
+                          </div>
+                        </div>
+                        <div className="flex justify-between text-lg font-black pt-4 border-t border-zinc-900">
+                          <span>JUMLAH</span>
+                          <span className="font-mono">RM {(cartTotal + shippingFee).toFixed(2)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          };
+
+          // --- ORDER SUCCESS VIEW ---
+          const OrderSuccessView = () => (
+            <div className="bg-black min-h-screen text-white flex items-center justify-center py-20 px-4">
+              <div className="max-w-md w-full text-center space-y-6">
+                <div className="w-16 h-16 bg-green-950/50 text-green-500 rounded-full flex items-center justify-center mx-auto border border-green-900">
+                  <Check size={32} />
+                </div>
+                <h1 className="text-3xl font-black tracking-tight">PESANAN DITERIMA</h1>
+                <p className="text-zinc-400 text-xs">Terima kasih kerana membeli bersama kami. Nombor Pesanan anda:</p>
+                <div className="bg-zinc-950 border border-zinc-900 p-4 rounded-sm">
+                  <p className="text-2xl font-mono font-bold tracking-widest text-white">{completedOrder?.id || 'VX-982314'}</p>
+                </div>
+                <p className="text-xs text-zinc-500 leading-relaxed">
+                  Kami akan mengesahkan semakan bayaran dan mengemas kini status penghantaran dalam masa 24 jam.
+                </p>
+                <div className="pt-4">
+                  <button 
+                    onClick={() => navigateTo('storefront')} 
+                    className="bg-white text-black px-8 py-3 text-xs font-bold tracking-wider rounded-sm hover:bg-zinc-200"
+                  >
+                    KEMBALI KE KEDAI
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+
+          // --- ADMIN DASHBOARD ---
+          const AdminDashboard = () => {
+            const [adminTab, setAdminTab] = useState('orders'); // orders, settings
+            const [saveStatus, setSaveStatus] = useState('');
+
+            const handleUpdateOrderStatus = (orderId, newPayStatus, newFulfilStatus) => {
+              setOrders(prev => prev.map(o => o.id === orderId ? { ...o, paymentStatus: newPayStatus, fulfilmentStatus: newFulfilStatus } : o));
+              showNotification(`Status Pesanan ${orderId} berjaya dikemas kini!`, 'success');
+            };
+
+            return (
+              <div className="min-h-screen bg-zinc-950 text-zinc-300 flex flex-col md:flex-row">
+                {/* Admin Sidebar */}
+                <div className="w-full md:w-64 bg-black border-r border-zinc-900 flex flex-col">
+                  <div className="p-6 border-b border-zinc-900">
+                    <h2 className="text-white font-black tracking-tighter text-lg">VELOX ADMIN</h2>
+                    <p className="text-[10px] text-zinc-500 font-mono mt-0.5">Control Panel v1.0</p>
+                  </div>
+                  <div className="p-4 space-y-2 flex-grow">
+                    <button 
+                      onClick={() => setAdminTab('orders')} 
+                      className={`w-full flex items-center px-4 py-3 rounded-sm text-xs font-medium transition-colors ${adminTab === 'orders' ? 'bg-zinc-900 text-white font-bold' : 'hover:bg-zinc-900/50 text-zinc-400'}`}
+                    >
+                      <Package size={16} className="mr-3" /> Senarai Pesanan ({orders.length})
+                    </button>
+                    <button 
+                      onClick={() => setAdminTab('settings')} 
+                      className={`w-full flex items-center px-4 py-3 rounded-sm text-xs font-medium transition-colors ${adminTab === 'settings' ? 'bg-zinc-900 text-white font-bold' : 'hover:bg-zinc-900/50 text-zinc-400'}`}
+                    >
+                      <Settings size={16} className="mr-3" /> Tetapan QR & Bank
+                    </button>
+                  </div>
+                  <div className="p-4 border-t border-zinc-900">
+                    <button 
+                      onClick={() => navigateTo('storefront')} 
+                      className="w-full flex items-center justify-center px-4 py-2.5 bg-white text-black font-bold rounded-sm text-xs hover:bg-zinc-200"
+                    >
+                      KEMBALI KE STOREFRONT
+                    </button>
+                  </div>
+                </div>
+
+                {/* Main Admin Area */}
+                <div className="flex-1 overflow-y-auto p-6 md:p-8 bg-black">
+                  {adminTab === 'orders' && (
+                    <div className="space-y-6">
+                      <h2 className="text-xl font-bold text-white border-b border-zinc-900 pb-3">PENGURUSAN PESANAN</h2>
+                      
+                      <div className="bg-zinc-950 border border-zinc-900 rounded-sm overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-zinc-900 text-zinc-400 font-mono border-b border-zinc-800">
+                            <tr>
+                              <th className="p-3">ORDER ID</th>
+                              <th className="p-3">PELANGGAN</th>
+                              <th className="p-3">BAYARAN</th>
+                              <th className="p-3">STATUS</th>
+                              <th className="p-3">JUMLAH</th>
+                              <th className="p-3">TINDAKAN</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-zinc-900">
+                            {orders.length === 0 ? (
+                              <tr>
+                                <td colSpan="6" className="p-8 text-center text-zinc-600">
+                                  Tiada pesanan baru lagi. Sila buat ujian pembelian di Storefront.
+                                </td>
+                              </tr>
+                            ) : (
+                              orders.map(order => (
+                                <tr key={order.id} className="hover:bg-zinc-900/50">
+                                  <td className="p-3 font-mono text-white font-bold">{order.id}</td>
+                                  <td className="p-3">
+                                    <p className="text-white font-medium">{order.customer.fullName}</p>
+                                    <p className="text-[10px] text-zinc-500">{order.customer.phone} • {order.customer.state}</p>
+                                  </td>
+                                  <td className="p-3 uppercase font-mono text-[10px] text-zinc-400">{order.paymentMethod}</td>
+                                  <td className="p-3">
+                                    <span className={`px-2 py-0.5 text-[10px] font-mono rounded ${
+                                      order.paymentStatus === 'paid' ? 'bg-green-950 text-green-400 border border-green-900' :
+                                      order.paymentStatus === 'under_review' ? 'bg-amber-950 text-amber-400 border border-amber-900' :
+                                      'bg-zinc-900 text-zinc-400'
+                                    }`}>
+                                      {order.paymentStatus}
+                                    </span>
+                                  </td>
+                                  <td className="p-3 font-mono text-white">RM {order.total.toFixed(2)}</td>
+                                  <td className="p-3 space-x-2">
+                                    {order.paymentStatus === 'under_review' && (
+                                      <>
+                                        <button 
+                                          onClick={() => handleUpdateOrderStatus(order.id, 'paid', 'processing')}
+                                          className="bg-green-600 hover:bg-green-500 text-white font-bold px-2 py-1 rounded text-[10px]"
+                                        >
+                                          LULUSKAN
+                                        </button>
+                                        <button 
+                                          onClick={() => handleUpdateOrderStatus(order.id, 'rejected', 'cancelled')}
+                                          className="bg-red-950 hover:bg-red-900 text-red-400 font-bold px-2 py-1 rounded text-[10px]"
+                                        >
+                                          TOLAK
+                                        </button>
+                                      </>
+                                    )}
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+
+                  {adminTab === 'settings' && (
+                    <div className="max-w-2xl bg-zinc-950 border border-zinc-900 p-6 rounded-sm space-y-6">
+                      <h2 className="text-xl font-bold text-white border-b border-zinc-900 pb-3">TETAPAN KEDAI & DUITNOW QR</h2>
+                      
+                      {/* DuitNow QR Upload Section */}
+                      <div className="space-y-4">
+                        <h3 className="text-sm font-bold text-white uppercase tracking-wider">Muat Naik Gambar DuitNow QR</h3>
+                        <div className="flex items-center gap-6">
+                          <div className="w-32 h-32 bg-black border border-zinc-800 rounded-sm overflow-hidden flex items-center justify-center flex-shrink-0">
+                            {storeSettings.qrImageUrl ? (
+                              <img src={storeSettings.qrImageUrl} alt="DuitNow QR Code" className="w-full h-full object-contain bg-white p-2" />
+                            ) : (
+                              <div className="text-center text-zinc-600 text-[10px] font-mono p-2">Tiada QR Uploaded</div>
+                            )}
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <label className="bg-white text-black font-bold text-xs px-4 py-2 rounded-sm cursor-pointer hover:bg-zinc-200 transition-colors inline-flex items-center">
+                              <Upload size={14} className="mr-2" /> UPLOAD GAMBAR QR
+                              <input 
+                                type="file" 
+                                accept="image/*" 
+                                className="hidden" 
+                                onChange={(e) => {
+                                  const file = e.target.files && e.target.files[0];
+                                  if (!file) return;
+                                  if (file.size > 5 * 1024 * 1024) {
+                                    showNotification("Saiz fail terlalu besar (Max 5MB)", "error");
+                                    return;
+                                  }
+                                  const reader = new FileReader();
+                                  reader.onload = (evt) => {
+                                    setStoreSettings(prev => ({ ...prev, qrImageUrl: evt.target.result }));
+                                    showNotification("Gambar DuitNow QR berjaya di-upload!", "success");
+                                  };
+                                  reader.readAsDataURL(file);
+                                }}
+                              />
+                            </label>
+                            
+                            {storeSettings.qrImageUrl && (
+                              <div>
+                                <button 
+                                  onClick={() => {
+                                    setStoreSettings(prev => ({ ...prev, qrImageUrl: '' }));
+                                    showNotification("Gambar DuitNow QR telah dipadam.", "info");
+                                  }}
+                                  className="text-xs text-red-500 hover:text-red-400 font-mono underline"
+                                >
+                                  Padam QR Code
+                                </button>
+                              </div>
+                            )}
+                            <p className="text-[11px] text-zinc-500 leading-relaxed">Sokong JPG atau PNG (Max 5MB). Gambar ini akan dipaparkan semasa pelanggan meneliti pilihan bayaran DuitNow QR.</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Bank Details Config */}
+                      <div className="pt-6 border-t border-zinc-900 space-y-4">
+                        <h3 className="text-sm font-bold text-white uppercase tracking-wider">Maklumat Bank Transfer</h3>
+                        
+                        <div className="space-y-3 text-xs">
+                          <div>
+                            <label className="block text-zinc-500 font-mono mb-1">NAMA BANK</label>
+                            <input 
+                              type="text" 
+                              value={storeSettings.bankDetails.bankName} 
+                              onChange={(e) => setStoreSettings(prev => ({ ...prev, bankDetails: { ...prev.bankDetails, bankName: e.target.value } }))} 
+                              className="w-full bg-black border border-zinc-800 p-2.5 text-white rounded-sm outline-none focus:border-zinc-500" 
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-zinc-500 font-mono mb-1">NAMA PEMEGANG AKAUN</label>
+                            <input 
+                              type="text" 
+                              value={storeSettings.bankDetails.accountName} 
+                              onChange={(e) => setStoreSettings(prev => ({ ...prev, bankDetails: { ...prev.bankDetails, accountName: e.target.value } }))} 
+                              className="w-full bg-black border border-zinc-800 p-2.5 text-white rounded-sm outline-none focus:border-zinc-500" 
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-zinc-500 font-mono mb-1">NOMBOR AKAUN</label>
+                            <input 
+                              type="text" 
+                              value={storeSettings.bankDetails.accountNumber} 
+                              onChange={(e) => setStoreSettings(prev => ({ ...prev, bankDetails: { ...prev.bankDetails, accountNumber: e.target.value } }))} 
+                              className="w-full bg-black border border-zinc-800 p-2.5 text-white rounded-sm outline-none focus:border-zinc-500" 
+                            />
+                          </div>
+                        </div>
+
+                        <div className="pt-4">
+                          <button 
+                            onClick={() => showNotification("Tetapan bank berjaya disimpan!", "success")}
+                            className="bg-white text-black font-bold px-6 py-2.5 rounded-sm text-xs hover:bg-zinc-200"
+                          >
+                            SIMPAN TETAPAN
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          };
+
+          // --- SETUP & SQL SCHEMA MODAL ---
+          const SetupInstructionsModal = () => (
+            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-zinc-950 border border-zinc-800 rounded-sm w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 relative">
+                <button 
+                  onClick={() => setShowSetupModal(false)}
+                  className="absolute top-4 right-4 text-zinc-400 hover:text-white p-2"
+                >
+                  <X size={20} />
+                </button>
+                
+                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <Database size={22} className="text-blue-500" /> Arahan Migrasi & Schema SQL Supabase
+                </h2>
+                <p className="text-xs text-zinc-400 mb-4">
+                  Apabila anda bersedia untuk menyambungkan aplikasi ini ke backend Supabase sebenar, salin skrip SQL di bawah ke dalam **SQL Editor** Supabase anda.
+                </p>
+
+                <div className="bg-black p-4 rounded border border-zinc-800 font-mono text-[11px] text-zinc-300 max-h-80 overflow-y-auto whitespace-pre-wrap">
+{`-- SQL MIGRATION FOR VELOX STREETWEAR
+CREATE TABLE products (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT,
+  price DECIMAL(10,2) NOT NULL,
+  sale_price DECIMAL(10,2),
+  status TEXT DEFAULT 'published',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE product_variants (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  product_id UUID REFERENCES products(id) ON DELETE CASCADE,
+  size TEXT NOT NULL,
+  color TEXT NOT NULL,
+  stock_quantity INT DEFAULT 0
+);
+
+CREATE TABLE orders (
+  id TEXT PRIMARY KEY,
+  customer_name TEXT NOT NULL,
+  customer_phone TEXT NOT NULL,
+  shipping_address TEXT NOT NULL,
+  total_amount DECIMAL(10,2) NOT NULL,
+  payment_method TEXT NOT NULL,
+  payment_status TEXT DEFAULT 'awaiting_payment',
+  fulfilment_status TEXT DEFAULT 'unfulfilled',
+  receipt_path TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);`}
+                </div>
+              </div>
+            </div>
+          );
+
+          // --- MAIN RENDER ---
+          return (
+            <div className="flex-1 flex flex-col min-h-screen">
+              {/* Toast Notification */}
+              {toastMessage && (
+                <div className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-sm shadow-xl border flex items-center gap-3 text-xs font-medium animate-bounce ${
+                  toastMessage.type === 'error' ? 'bg-red-950 border-red-800 text-red-200' :
+                  toastMessage.type === 'success' ? 'bg-green-950 border-green-800 text-green-200' :
+                  'bg-zinc-900 border-zinc-700 text-white'
+                }`}>
+                  <AlertCircle size={16} />
+                  <span>{toastMessage.msg}</span>
+                </div>
+              )}
+
+              {showSetupModal && <SetupInstructionsModal />}
+
+              {currentView !== 'admin' && <Navbar />}
+
+              <main className="flex-1">
+                {currentView === 'storefront' && <StorefrontView />}
+                {currentView === 'product' && <ProductDetailView />}
+                {currentView === 'cart' && <CartView />}
+                {currentView === 'checkout' && <CheckoutView />}
+                {currentView === 'order-success' && <OrderSuccessView />}
+                {currentView === 'admin' && <AdminDashboard />}
+              </main>
+
+              {/* Footer */}
+              <footer className="bg-black border-t border-zinc-900 text-zinc-500 text-xs py-8 px-4 text-center">
+                <div className="max-w-7xl mx-auto space-y-3">
+                  <p className="font-bold text-white tracking-widest">{storeSettings.brandName}</p>
+                  <p>© 2026 {storeSettings.brandName}. Hak Cipta Terpelihara.</p>
+                  <div className="flex justify-center space-x-6 text-[11px] pt-2">
+                    <button onClick={() => navigateTo('storefront')} className="hover:text-white">STOREFRONT</button>
+                    <button onClick={() => navigateTo('admin')} className="hover:text-white">ADMIN LOGIN</button>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          );
+        }
+
+        // Render to DOM
+        const rootElement = document.getElementById('root');
+        const root = ReactDOM.createRoot(rootElement);
+        root.render(<App />);
+    </script>
+</body>
+</html>
